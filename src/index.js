@@ -1,2 +1,5 @@
-const bodyElement = document.querySelector(`body`);
-bodyElement.textContent = `Hello, hello, hello!`;
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+
+ReactDOM.render(<App />, document.getElementById(`root`));
