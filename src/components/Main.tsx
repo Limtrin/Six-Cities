@@ -1,13 +1,17 @@
 import * as React from "react";
+import {useState} from "react";
 import { RentalOffersInterface } from "../types";
+import { NavLink } from 'react-router-dom';
 
 interface Props {
   rentalOffers: RentalOffersInterface
 }
 
-const Main: React.SFC<Props> = (props: Props) => {
+const Main: React.FunctionComponent<Props> = (props: Props) => {
+  const [isOpenedPlaces, setOpenedPlaces] = useState(false);
 
   const rentalOffers = props.rentalOffers;
+  const placesOptionsClasses = `places__options places__options--custom ${isOpenedPlaces ? `places__options--opened` : null}`;
 
   return (
     <div className="page page--gray page--main">
@@ -79,13 +83,17 @@ const Main: React.SFC<Props> = (props: Props) => {
               <b className="places__found">312 places to stay in Amsterdam</b>
               <form className="places__sorting" action="#" method="get">
                 <span className="places__sorting-caption">Sort by</span>
-                <span className="places__sorting-type" tabIndex={0}>
+                <span
+                  className="places__sorting-type"
+                  tabIndex={0}
+                  onClick={() => setOpenedPlaces(!isOpenedPlaces)}
+                >
                   Popular
                   <svg className="places__sorting-arrow" width="7" height="4">
                     <use xlinkHref="#icon-arrow-select"></use>
                   </svg>
                 </span>
-                <ul className="places__options places__options--custom">
+                <ul className={placesOptionsClasses}>
                   <li className="places__option places__option--active" tabIndex={0}>Popular</li>
                   <li className="places__option" tabIndex={0}>Price: low to high</li>
                   <li className="places__option" tabIndex={0}>Price: high to low</li>
@@ -102,12 +110,15 @@ const Main: React.SFC<Props> = (props: Props) => {
 
                 {rentalOffers.map((rentalOffer) => {
 
-                  const bookmarkClasses = `place-card__bookmark-button ${rentalOffer.inBookmarks ? `place-card__bookmark-button--active` : null} button`;
+                  const bookmarkClasses = `place-card__bookmark-button ${rentalOffer.is_favorite ? `place-card__bookmark-button--active` : null} button`;
                   const ratingPercents = rentalOffer.rating * 20;
 
                   return (
-                    <article className="cities__place-card place-card">
-                      {rentalOffer.isPremium ? 
+                    <article
+                      key={rentalOffer.id}
+                      className="cities__place-card place-card"
+                    >
+                      {rentalOffer.is_premium ? 
                         <div className="place-card__mark">
                           <span>Premium</span>
                         </div> :
@@ -115,7 +126,7 @@ const Main: React.SFC<Props> = (props: Props) => {
                       }
                       <div className="cities__image-wrapper place-card__image-wrapper">
                         <a href="#">
-                          <img className="place-card__image" src={rentalOffer.image} width="260" height="200" alt="Place image" />
+                          <img className="place-card__image" src={rentalOffer.preview_image} width="260" height="200" alt="Place image" />
                         </a>
                       </div>
                       <div className="place-card__info">
@@ -138,7 +149,7 @@ const Main: React.SFC<Props> = (props: Props) => {
                           </div>
                         </div>
                         <h2 className="place-card__name">
-                          <a href="#">{rentalOffer.name}</a>
+                          <NavLink to={`/offer/${rentalOffer.id}`}>{rentalOffer.title}</NavLink>
                         </h2>
                         <p className="place-card__type">{rentalOffer.type}</p>
                       </div>
@@ -157,4 +168,5 @@ const Main: React.SFC<Props> = (props: Props) => {
     </div>
   );
 };
+
 export default Main;
