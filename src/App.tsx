@@ -1,6 +1,6 @@
 import * as React from "react";
 import Main from "./components/Main";
-import Offer from "./components/Offer";
+import OfferPage from "./components/OfferPage";
 import { RentalOffersInterface } from "./types";
 import {Route, Switch, Router, Redirect} from "react-router-dom";
 import history from "../history";
@@ -24,8 +24,10 @@ const App: React.SFC<Props> = (props: Props) => {
           // Здесь надо запилить обращение к API по offer id, это временное решение
           const chosenOffer = rentalOffers.find((offer) => offer.id == props.match.params.id);
           return chosenOffer && (
-            <Offer
+            <OfferPage
               rentalOffer={chosenOffer}
+              // Это тоже пока временно, всё вообще будет формироваться на серваке
+              rentalOffers={rentalOffers}
             />
           );
         }}

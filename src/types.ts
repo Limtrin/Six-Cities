@@ -1,5 +1,6 @@
 export interface RentalOfferInterface {
     id: number,
+    city: City,
     title: string,
     type: string,
     preview_image: string,
@@ -13,6 +14,18 @@ export interface RentalOfferInterface {
     goods: string[],
     host: Host,
     description: string,
+    location: Location,
+}
+
+interface City {
+    name: string,
+    location: Location,
+}
+
+interface Location {
+    latitude: number,
+    longitude: number,
+    zoom: number,
 }
 
 interface Host {
