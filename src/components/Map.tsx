@@ -1,63 +1,69 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
+import { connect } from "react-redux";
 import * as leaflet from "leaflet";
 
-const icon = leaflet.icon({
-  iconUrl: `/img/pin.svg`,
-  iconSize: [30, 30]
-});
+const PinIcons = {
+  pin: leaflet.icon({
+    iconUrl: `/img/pin.svg`,
+    iconSize: [30, 45]
+  }),
+  pinActive: leaflet.icon({
+    iconUrl: `/img/pin-active.svg`,
+    iconSize: [30, 45]
+  })
+};  
 
 interface Props {
   coordinates: number[][],
   zoom: number,
   center?: number[],
-} 
+  focusCityLocation: number[],
+}
 
 const Map: React.FunctionComponent<Props> = (props: Props) => {
-
-  let map = null;
   const center = props.center ? props.center : props.coordinates[0];
 
+  const mapRef = useRef(null);
   useEffect(() => {
-    if (!map) {
-      renderMap(center, props.zoom);
-    }
-
-    renderMarkers(props.coordinates);
+      mapRef.current = leaflet.map(`map`, {
+        marker: true,
+        scrollWheelZoom: false,
+        zoom: props.zoom,
+        center: center,
+        layers: [
+          leaflet
+            .tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png`, {
+              attribution: `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>`
+            }),
+        ]
+      });
 
     return () => {
-      map.remove();
-    };
-  });
+      mapRef.current.remove();
+    }
+  },[center]);
 
-  const renderMap = (centerCoordinates, zoom) => {
-    map = leaflet.map(`map`, {
-      center: centerCoordinates,
-      zoom: zoom,
-      marker: true,
-      scrollWheelZoom: false
-    });
+  const markerRef = useRef(null);
+  useEffect(() => {
+    markerRef.current = props.coordinates;
+    markerRef.current.forEach((offerCoords) => {
+      const {pin, pinActive} = PinIcons;
+      const icon = offerCoords.every((offerCoord, index)=> offerCoord === props.focusCityLocation[index]) ? pinActive : pin;
 
-    map.setView(centerCoordinates, zoom);
-
-    leaflet
-      .tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png`, {
-        attribution: `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>`
-      })
-      .addTo(map);
-  }
-
-  const renderMarkers = (offersCoords) => {
-    offersCoords.forEach((offerCoords) => {
       leaflet
         .marker(offerCoords, {icon})
-        .addTo(map);
-    });
-  }
+        .addTo(mapRef.current);
+    })
+  },[props.coordinates, props.focusCityLocation]);
 
   return (
-    <div id="map" style={{height: `100%`}} ></div>
+    <div id="map" style={{height: `100%`}}></div>
   );
 };
 
-export default Map;
+const mapStateToProps = (state) => ({
+  focusCityLocation: state.focusCityLocation,
+});
+
+export default connect(mapStateToProps)(Map);

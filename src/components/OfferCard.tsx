@@ -1,12 +1,15 @@
 import * as React from "react";
 import { RentalOfferInterface } from "../types";
 import { NavLink } from 'react-router-dom';
+import { connect } from "react-redux";
+import { ActionCreator } from "../reducer/reducer";
 
 type OfferCardType = `cities` | `near`;
 
 interface Props {
   rentalOffer: RentalOfferInterface,
   type: OfferCardType,
+  setFocusCityLocation: (focisCityLocation: Object) => void,
 }
 
 const cardMainClasses = {
@@ -20,13 +23,27 @@ const imageMainClasses = {
 }
 
 const OfferCard: React.FunctionComponent<Props> = (props: Props) => {
-  const {rentalOffer, type} = props;
+  const {rentalOffer, type, setFocusCityLocation} = props;
 
   const bookmarkClasses = rentalOffer.is_favorite ? `place-card__bookmark-button--active` : null;
   const ratingPercents = rentalOffer.rating * 20;
 
+  const handleItemEnter = (location: number[]) => {
+    setFocusCityLocation(location);
+  }
+
+  const handleItemLeave = () => {
+    setFocusCityLocation([]);
+  }
+
   return (
     <article
+      onMouseEnter={() => {
+        handleItemEnter([rentalOffer.location.latitude, rentalOffer.location.longitude]);
+      }}
+      onMouseLeave={() => {
+        handleItemLeave();
+      }}
       className={`${cardMainClasses[type]} place-card`}
     >
       {rentalOffer.is_premium ? 
@@ -68,4 +85,10 @@ const OfferCard: React.FunctionComponent<Props> = (props: Props) => {
   );
 };
 
-export default OfferCard;
+const mapDispatchToProps = (dispatch) => ({
+  setFocusCityLocation: (focusCityLocation) => {
+    dispatch(ActionCreator.setFocusCityLocation(focusCityLocation));
+  }
+});
+
+export default connect(null, mapDispatchToProps)(OfferCard);

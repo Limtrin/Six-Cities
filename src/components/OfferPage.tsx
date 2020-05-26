@@ -1,18 +1,31 @@
 import * as React from "react";
+import axios from "axios";
+import { useEffect } from "react";
+import { connect } from "react-redux";
 import { RentalOfferInterface, RentalOffersInterface } from "../types";
 import { capitalize } from "../utils";
+import { ActionCreator } from "../reducer/reducer";
 import Map from "./Map";
 import OfferCard from "./OfferCard";
+import ReviewsList from "./ReviewsList";
 
 interface Props {
   rentalOffer: RentalOfferInterface,
-  rentalOffers: RentalOffersInterface,
+  nearbyOffers: RentalOffersInterface,
+  setNearbyOffersList: (data: Object) => void,
 }
 
 const OfferPage: React.FunctionComponent<Props> = (props: Props) => {
 
-  const {rentalOffer, rentalOffers} = props;
-  const nearbyRentalOffers = rentalOffers.filter((rentalOfferItem) => rentalOfferItem.city.name === rentalOffer.city.name && rentalOfferItem.id !== rentalOffer.id);
+  useEffect(() => {
+    if (props.nearbyOffers.length === 0) {
+      axios.get(`https://htmlacademy-react-3.appspot.com/six-cities/hotels/${rentalOffer.id}/nearby`).then((response) => {
+        props.setNearbyOffersList(response.data);
+      });
+    }
+  });
+
+  const {rentalOffer, nearbyOffers} = props;
 
   const ratingPercents = rentalOffer.rating * 20;
   const propertyBookmarkClasses = rentalOffer.is_favorite ? `property__bookmark-button--active` : null;
@@ -130,31 +143,9 @@ const OfferPage: React.FunctionComponent<Props> = (props: Props) => {
                 </div>
               </div>
               <section className="property__reviews reviews">
-                <h2 className="reviews__title">Reviews &middot; <span className="reviews__amount">1</span></h2>
-                <ul className="reviews__list">
-                  <li className="reviews__item">
-                    <div className="reviews__user user">
-                      <div className="reviews__avatar-wrapper user__avatar-wrapper">
-                        <img className="reviews__avatar user__avatar" src="/img/avatar-max.jpg" width="54" height="54" alt="Reviews avatar" />
-                      </div>
-                      <span className="reviews__user-name">
-                        Max
-                      </span>
-                    </div>
-                    <div className="reviews__info">
-                      <div className="reviews__rating rating">
-                        <div className="reviews__stars rating__stars">
-                          <span style={{width: ratingPercents + `%`}}></span>
-                          <span className="visually-hidden">Rating</span>
-                        </div>
-                      </div>
-                      <p className="reviews__text">
-                        A quiet cozy and picturesque that hides behind a a river by the unique lightness of Amsterdam. The building is green and from 18th century.
-                      </p>
-                      <time className="reviews__time" dateTime="2019-04-24">April 2019</time>
-                    </div>
-                  </li>
-                </ul>
+                <ReviewsList
+                  id={rentalOffer.id}
+                />
                 <form className="reviews__form form" action="#" method="post">
                   <label className="reviews__label form__label" htmlFor="review">Your review</label>
                   <div className="reviews__rating-form form__rating">
@@ -216,7 +207,7 @@ const OfferPage: React.FunctionComponent<Props> = (props: Props) => {
             <h2 className="near-places__title">Other places in the neighbourhood</h2>
             <div className="near-places__list places__list">
 
-              {nearbyRentalOffers.map((nearbyRentalOffer) => (
+              {nearbyOffers.map((nearbyRentalOffer) => (
                 <OfferCard
                   rentalOffer={nearbyRentalOffer}
                   type={`near`}
@@ -232,4 +223,14 @@ const OfferPage: React.FunctionComponent<Props> = (props: Props) => {
   );
 };
 
-export default OfferPage;
+const mapStateToProps = (state) => ({
+  nearbyOffers: state.nearbyOffersList,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  setNearbyOffersList: (offersList) => {
+    dispatch(ActionCreator.setNearbyOffersList(offersList));
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(OfferPage);

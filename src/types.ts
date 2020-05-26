@@ -17,12 +17,27 @@ export interface RentalOfferInterface {
     location: Location,
 }
 
+export interface Review {
+    id: number,
+    user: User,
+    rating: number,
+    comment: string,
+    date: string,
+}
+
+interface User {
+    id: number,
+    is_pro: boolean,
+    name: string,
+    avatar_url: string,
+}
+
 interface City {
     name: string,
     location: Location,
 }
 
-interface Location {
+export interface Location {
     latitude: number,
     longitude: number,
     zoom: number,
@@ -35,4 +50,5 @@ interface Host {
     avatar_url: string,
 }
 
-export type RentalOffersInterface = RentalOfferInterface[]
+export type Reviews = Review[];
+export type RentalOffersInterface = RentalOfferInterface[];

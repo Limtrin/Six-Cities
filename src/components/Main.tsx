@@ -1,18 +1,23 @@
 import * as React from "react";
-import {useState} from "react";
+import { connect } from "react-redux";
+import { useState, useEffect } from "react";
 import { RentalOffersInterface } from "../types";
 import Map from "./Map";
 import OfferCard from "./OfferCard";
+import Preloader from "./Preloader";
+import Tabs from "./Tabs";
 
 interface Props {
-  rentalOffers: RentalOffersInterface
+  rentalOffers: RentalOffersInterface,
+  currentCity: string,
 }
 
 const Main: React.FunctionComponent<Props> = (props: Props) => {
   const [isOpenedPlaces, setOpenedPlaces] = useState(false);
 
-  const rentalOffers = props.rentalOffers.filter((rentalOffer) => rentalOffer.city.name === `Amsterdam`);
+  const { rentalOffers, currentCity }  = props;
   const placesOptionsClasses = `places__options places__options--custom ${isOpenedPlaces ? `places__options--opened` : null}`;
+  const rentalOffersByCity = rentalOffers.filter((rentalOffer) => rentalOffer.city.name === currentCity);
 
   return (
     <div className="page page--gray page--main">
@@ -41,93 +46,62 @@ const Main: React.FunctionComponent<Props> = (props: Props) => {
 
       <main className="page__main page__main--index">
         <h1 className="visually-hidden">Cities</h1>
-        <div className="tabs">
-          <section className="locations container">
-            <ul className="locations__list tabs__list">
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Paris</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Cologne</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Brussels</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item tabs__item--active">
-                  <span>Amsterdam</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Hamburg</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Dusseldorf</span>
-                </a>
-              </li>
-            </ul>
-          </section>
-        </div>
+        <Tabs />
         <div className="cities">
           <div className="cities__places-container container">
-            <section className="cities__places places">
-              <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">{rentalOffers.length} places to stay in Amsterdam</b>
-              <form className="places__sorting" action="#" method="get">
-                <span className="places__sorting-caption">Sort by</span>
-                <span
-                  className="places__sorting-type"
-                  tabIndex={0}
-                  onClick={() => setOpenedPlaces(!isOpenedPlaces)}
-                >
-                  Popular
-                  <svg className="places__sorting-arrow" width="7" height="4">
-                    <use xlinkHref="#icon-arrow-select"></use>
-                  </svg>
-                </span>
-                <ul className={placesOptionsClasses}>
-                  <li className="places__option places__option--active" tabIndex={0}>Popular</li>
-                  <li className="places__option" tabIndex={0}>Price: low to high</li>
-                  <li className="places__option" tabIndex={0}>Price: high to low</li>
-                  <li className="places__option" tabIndex={0}>Top rated first</li>
-                </ul>
-                {/* <select className="places__sorting-type" id="places-sorting">
-                  <option className="places__option" value="popular" selected="">Popular</option>
-                  <option className="places__option" value="to-high">Price: low to high</option>
-                  <option className="places__option" value="to-low">Price: high to low</option>
-                  <option className="places__option" value="top-rated">Top rated first</option>
-                </select> */}
-              </form>
-              <div className="cities__places-list places__list tabs__content">
-
-                {rentalOffers.map((rentalOffer) => (
-                  <OfferCard
-                    rentalOffer={rentalOffer}
-                    type={`cities`}
-                    key={rentalOffer.id}
-                  />
-                ))}
-
-              </div>
-            </section>
-            <div className="cities__right-section">
-              <section className="cities__map map">
-                <Map
-                  zoom={12}
-                  coordinates={rentalOffers.map((rentalOffer) => [rentalOffer.location.latitude, rentalOffer.location.longitude])}
-                  center={[52.38333, 4.9]}
-                />
-              </section>
-            </div>
+            {
+              props.rentalOffers.length ?
+              <>
+                <section className="cities__places places">
+                  <h2 className="visually-hidden">Places</h2>
+                  <b className="places__found">{rentalOffersByCity.length} places to stay in {currentCity}</b>
+                  <form className="places__sorting" action="#" method="get">
+                    <span className="places__sorting-caption">Sort by</span>
+                    <span
+                      className="places__sorting-type"
+                      tabIndex={0}
+                      onClick={() => setOpenedPlaces(!isOpenedPlaces)}
+                    >
+                      Popular
+                      <svg className="places__sorting-arrow" width="7" height="4">
+                        <use xlinkHref="#icon-arrow-select"></use>
+                      </svg>
+                    </span>
+                    <ul className={placesOptionsClasses}>
+                      <li className="places__option places__option--active" tabIndex={0}>Popular</li>
+                      <li className="places__option" tabIndex={0}>Price: low to high</li>
+                      <li className="places__option" tabIndex={0}>Price: high to low</li>
+                      <li className="places__option" tabIndex={0}>Top rated first</li>
+                    </ul>
+                    {/* <select className="places__sorting-type" id="places-sorting">
+                      <option className="places__option" value="popular" selected="">Popular</option>
+                      <option className="places__option" value="to-high">Price: low to high</option>
+                      <option className="places__option" value="to-low">Price: high to low</option>
+                      <option className="places__option" value="top-rated">Top rated first</option>
+                    </select> */}
+                  </form>
+                  <div className="cities__places-list places__list tabs__content">
+                    {rentalOffersByCity.map((rentalOffer) => (
+                      <OfferCard
+                        rentalOffer={rentalOffer}
+                        type={`cities`}
+                        key={rentalOffer.id}
+                      />
+                    ))}
+                  </div>
+                </section>
+                <div className="cities__right-section">
+                  <section className="cities__map map">
+                    <Map
+                      zoom={rentalOffersByCity[0].city.location.zoom}
+                      coordinates={rentalOffersByCity.map((rentalOffer) => [rentalOffer.location.latitude, rentalOffer.location.longitude])}
+                      center={[rentalOffersByCity[0].city.location.latitude, rentalOffersByCity[0].city.location.longitude]}
+                    />
+                  </section>
+                </div> 
+              </> :
+              <Preloader />
+            }
           </div>
         </div>
       </main>
@@ -135,4 +109,8 @@ const Main: React.FunctionComponent<Props> = (props: Props) => {
   );
 };
 
-export default Main;
+const mapStateToProps = (state) => ({
+  currentCity: state.currentCity,
+});
+
+export default connect(mapStateToProps)(Main);
