@@ -26,35 +26,39 @@ const Map: React.FunctionComponent<Props> = (props: Props) => {
 
   const mapRef = useRef(null);
   useEffect(() => {
-      mapRef.current = leaflet.map(`map`, {
-        marker: true,
-        scrollWheelZoom: false,
-        zoom: props.zoom,
-        center: center,
-        layers: [
-          leaflet
-            .tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png`, {
-              attribution: `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>`
-            }),
-        ]
-      });
+    mapRef.current = leaflet.map(`map`, {
+      marker: true,
+      scrollWheelZoom: false,
+      zoom: props.zoom,
+      center: center,
+      layers: [
+        leaflet
+          .tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png`, {
+            attribution: `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>`
+          }),
+      ]
+    });
 
     return () => {
       mapRef.current.remove();
     }
   },[center]);
 
-  const markerRef = useRef(null);
+  const coordsRef = useRef([]);
   useEffect(() => {
-    markerRef.current = props.coordinates;
-    markerRef.current.forEach((offerCoords) => {
-      const {pin, pinActive} = PinIcons;
-      const icon = offerCoords.every((offerCoord, index)=> offerCoord === props.focusCityLocation[index]) ? pinActive : pin;
-
-      leaflet
-        .marker(offerCoords, {icon})
+    if (coordsRef.current.length > 0) {
+      coordsRef.current.map((pinElement) => {
+        pinElement.remove();
+      });
+      coordsRef.current = [];
+    }
+    props.coordinates.forEach((offerCoords) => {
+      const isActive = offerCoords.every((coordinate, index) => coordinate === props.focusCityLocation[index]);
+      const pinElement = leaflet
+        .marker(offerCoords, {icon: isActive ? PinIcons.pinActive : PinIcons.pin})
         .addTo(mapRef.current);
-    })
+      coordsRef.current.push(pinElement);
+    });
   },[props.coordinates, props.focusCityLocation]);
 
   return (

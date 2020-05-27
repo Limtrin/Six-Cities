@@ -13,6 +13,7 @@ interface Props {
   rentalOffer: RentalOfferInterface,
   nearbyOffers: RentalOffersInterface,
   setNearbyOffersList: (data: Object) => void,
+  setFocusCityLocation: (dara: number[]) => void,
 }
 
 const OfferPage: React.FunctionComponent<Props> = (props: Props) => {
@@ -23,6 +24,7 @@ const OfferPage: React.FunctionComponent<Props> = (props: Props) => {
         props.setNearbyOffersList(response.data);
       });
     }
+    props.setFocusCityLocation([rentalOffer.location.latitude, rentalOffer.location.longitude])
   });
 
   const {rentalOffer, nearbyOffers} = props;
@@ -198,7 +200,7 @@ const OfferPage: React.FunctionComponent<Props> = (props: Props) => {
           <section className="property__map map">
             <Map
               zoom={rentalOffer.location.zoom}
-              coordinates={[[rentalOffer.location.latitude, rentalOffer.location.longitude]]}
+              coordinates={[[rentalOffer.location.latitude, rentalOffer.location.longitude],].concat(props.nearbyOffers.map((offer) => [offer.location.latitude, offer.location.longitude]))}
             />
           </section>
         </section>
@@ -207,13 +209,19 @@ const OfferPage: React.FunctionComponent<Props> = (props: Props) => {
             <h2 className="near-places__title">Other places in the neighbourhood</h2>
             <div className="near-places__list places__list">
 
-              {nearbyOffers.map((nearbyRentalOffer) => (
-                <OfferCard
-                  rentalOffer={nearbyRentalOffer}
-                  type={`near`}
-                  key={nearbyRentalOffer.id}
-                />
-              ))}
+                {nearbyOffers.map((nearbyRentalOffer) => (
+                  <div
+                    onMouseLeave={() => {
+                      props.setFocusCityLocation([rentalOffer.location.latitude, rentalOffer.location.longitude])
+                    }}
+                  >
+                    <OfferCard
+                      rentalOffer={nearbyRentalOffer}
+                      type={`near`}
+                      key={nearbyRentalOffer.id}
+                    />
+                  </div>
+                ))}
 
             </div>
           </section>
@@ -230,6 +238,9 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   setNearbyOffersList: (offersList) => {
     dispatch(ActionCreator.setNearbyOffersList(offersList));
+  },
+  setFocusCityLocation: (focusCityLocation) => {
+    dispatch(ActionCreator.setFocusCityLocation(focusCityLocation));
   }
 });
 

@@ -1,23 +1,19 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { useState, useEffect } from "react";
 import { RentalOffersInterface } from "../types";
+import { getRentalOffersCurrent } from "../reducer/selectors";
 import Map from "./Map";
-import OfferCard from "./OfferCard";
 import Preloader from "./Preloader";
 import Tabs from "./Tabs";
+import OfferCardsList from "./OfferCardsList";
 
 interface Props {
-  rentalOffers: RentalOffersInterface,
-  currentCity: string,
+  rentalOffersCurrent: RentalOffersInterface,
 }
 
 const Main: React.FunctionComponent<Props> = (props: Props) => {
-  const [isOpenedPlaces, setOpenedPlaces] = useState(false);
 
-  const { rentalOffers, currentCity }  = props;
-  const placesOptionsClasses = `places__options places__options--custom ${isOpenedPlaces ? `places__options--opened` : null}`;
-  const rentalOffersByCity = rentalOffers.filter((rentalOffer) => rentalOffer.city.name === currentCity);
+  const { rentalOffersCurrent }  = props;
 
   return (
     <div className="page page--gray page--main">
@@ -50,55 +46,18 @@ const Main: React.FunctionComponent<Props> = (props: Props) => {
         <div className="cities">
           <div className="cities__places-container container">
             {
-              props.rentalOffers.length ?
+              rentalOffersCurrent.length ?
               <>
-                <section className="cities__places places">
-                  <h2 className="visually-hidden">Places</h2>
-                  <b className="places__found">{rentalOffersByCity.length} places to stay in {currentCity}</b>
-                  <form className="places__sorting" action="#" method="get">
-                    <span className="places__sorting-caption">Sort by</span>
-                    <span
-                      className="places__sorting-type"
-                      tabIndex={0}
-                      onClick={() => setOpenedPlaces(!isOpenedPlaces)}
-                    >
-                      Popular
-                      <svg className="places__sorting-arrow" width="7" height="4">
-                        <use xlinkHref="#icon-arrow-select"></use>
-                      </svg>
-                    </span>
-                    <ul className={placesOptionsClasses}>
-                      <li className="places__option places__option--active" tabIndex={0}>Popular</li>
-                      <li className="places__option" tabIndex={0}>Price: low to high</li>
-                      <li className="places__option" tabIndex={0}>Price: high to low</li>
-                      <li className="places__option" tabIndex={0}>Top rated first</li>
-                    </ul>
-                    {/* <select className="places__sorting-type" id="places-sorting">
-                      <option className="places__option" value="popular" selected="">Popular</option>
-                      <option className="places__option" value="to-high">Price: low to high</option>
-                      <option className="places__option" value="to-low">Price: high to low</option>
-                      <option className="places__option" value="top-rated">Top rated first</option>
-                    </select> */}
-                  </form>
-                  <div className="cities__places-list places__list tabs__content">
-                    {rentalOffersByCity.map((rentalOffer) => (
-                      <OfferCard
-                        rentalOffer={rentalOffer}
-                        type={`cities`}
-                        key={rentalOffer.id}
-                      />
-                    ))}
-                  </div>
-                </section>
+                <OfferCardsList />
                 <div className="cities__right-section">
                   <section className="cities__map map">
                     <Map
-                      zoom={rentalOffersByCity[0].city.location.zoom}
-                      coordinates={rentalOffersByCity.map((rentalOffer) => [rentalOffer.location.latitude, rentalOffer.location.longitude])}
-                      center={[rentalOffersByCity[0].city.location.latitude, rentalOffersByCity[0].city.location.longitude]}
+                      zoom={rentalOffersCurrent[0].city.location.zoom}
+                      coordinates={rentalOffersCurrent.map((rentalOffer) => [rentalOffer.location.latitude, rentalOffer.location.longitude])}
+                      center={[rentalOffersCurrent[0].city.location.latitude, rentalOffersCurrent[0].city.location.longitude]}
                     />
                   </section>
-                </div> 
+                </div>
               </> :
               <Preloader />
             }
@@ -110,7 +69,7 @@ const Main: React.FunctionComponent<Props> = (props: Props) => {
 };
 
 const mapStateToProps = (state) => ({
-  currentCity: state.currentCity,
+  rentalOffersCurrent: getRentalOffersCurrent(state),
 });
 
 export default connect(mapStateToProps)(Main);

@@ -4,6 +4,7 @@ const initialState = {
   nearbyOffersList: [],
   reviewsList: [],
   focusCityLocation: [],
+  currentSortStatus: `Popular`,
 }
 
 const ActionType = {
@@ -12,6 +13,7 @@ const ActionType = {
   SET_NEARBY_OFFERS_LIST: `SET_NEARBY_OFFERS_LIST`,
   SET_REVIEWS_LIST: `SET_REVIEWS_LIST`,
   SET_FOCUS_CITY_LOCATION: `SET_FOCUS_CITY_LOCATION`,
+  SET_CURRENT_SORT_STATUS: `SET_CURRENT_SORT_STATUS`,
 }
 
 const ActionCreator = {
@@ -39,6 +41,11 @@ const ActionCreator = {
     type: ActionType.SET_FOCUS_CITY_LOCATION,
     payload: focusCityLocation,
   }),
+
+  seCurrentSortStatus: (sortStatus) => ({
+    type: ActionType.SET_CURRENT_SORT_STATUS,
+    payload: sortStatus,
+  }),
 };
 
 const reducer = (state = initialState, action) => {
@@ -53,6 +60,8 @@ const reducer = (state = initialState, action) => {
       return {...state, reviewsList: action.payload};
     case ActionType.SET_FOCUS_CITY_LOCATION:
       return {...state, focusCityLocation: action.payload};
+    case ActionType.SET_CURRENT_SORT_STATUS:
+      return {...state, currentSortStatus: action.payload};
   }
 
   return state;

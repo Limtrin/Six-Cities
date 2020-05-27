@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { RentalOffersInterface } from "./types";
 import {Route, Switch, Router, Redirect} from "react-router-dom";
 import { ActionCreator } from "./reducer/reducer";
-import { getRentalOffersCurrent } from "./reducer/selectors";
 import axios from "axios";
 import history from "../history";
 import Main from "./components/Main";
@@ -30,9 +29,7 @@ const App: React.SFC<Props> = (props: Props) => {
     <Router history={history}>
       <Switch>
         <Route exact path="/">
-          <Main
-            rentalOffers={rentalOffers}
-          />
+          <Main />
         </Route>
         <Route exact path="/offer/:id" render={(props) => {
           const chosenOffer = rentalOffers.find((offer) => offer.id == props.match.params.id);
