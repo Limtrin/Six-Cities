@@ -8,10 +8,13 @@ import axios from "axios";
 import history from "../history";
 import Main from "./components/Main";
 import OfferPage from "./components/OfferPage";
+import Login from "./components/Login";
+import Favotites from "./components/Favotites";
 
 interface Props {
   rentalOffers: RentalOffersInterface,
   setRentalOffersList: (data: Object) => void,
+  setLoginStatus: (data: Boolean) => void,
 }
 
 const App: React.SFC<Props> = (props: Props) => {
@@ -22,6 +25,16 @@ const App: React.SFC<Props> = (props: Props) => {
       axios.get(`https://htmlacademy-react-3.appspot.com/six-cities/hotels`).then((response) => {
         props.setRentalOffersList(response.data);
       });
+    } else {
+      axios.get(`https://htmlacademy-react-3.appspot.com/six-cities/login`, { withCredentials: true } )
+      .then((response) => {
+        if (response.status === 200) {
+          props.setLoginStatus(true);
+        }
+      })
+      .catch(()=> {
+        return;
+      });  
     }
   });
 
@@ -35,11 +48,19 @@ const App: React.SFC<Props> = (props: Props) => {
           const chosenOffer = rentalOffers.find((offer) => offer.id == props.match.params.id);
           return chosenOffer && (
             <OfferPage
+              //Тут тоже самое
               rentalOffer={chosenOffer}
+              isFavorite={chosenOffer.is_favorite}
             />
           );
         }}
         />
+        <Route exact path="/login">
+          <Login />
+        </Route>
+        <Route exact path="/favorites">
+          <Favotites />
+        </Route>
       </Switch>
     </Router>
   );
@@ -52,6 +73,9 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   setRentalOffersList: (offersList) => {
     dispatch(ActionCreator.setRentalOffersList(offersList));
+  },
+  setLoginStatus: (loginStatus) => {
+    dispatch(ActionCreator.setLoginStatus(loginStatus));
   }
 });
 

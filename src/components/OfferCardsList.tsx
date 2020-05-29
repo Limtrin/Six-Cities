@@ -20,11 +20,13 @@ const Main: React.FunctionComponent<Props> = (props: Props) => {
       <b className="places__found">{rentalOffersCurrentSort.length} places to stay in {currentCity}</b>
       <Sort />
       <div className="cities__places-list places__list tabs__content">
-        {props.rentalOffersCurrentSort.map((rentalOffer) => (
+        {rentalOffersCurrentSort.map((rentalOffer) => (
           <OfferCard
+            //Вот над этим надо ещё подумать
             rentalOffer={rentalOffer}
             type={`cities`}
             key={rentalOffer.id}
+            isFavorite={rentalOffer.is_favorite}
           />
         ))}
       </div>

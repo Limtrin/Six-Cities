@@ -5,6 +5,8 @@ const initialState = {
   reviewsList: [],
   focusCityLocation: [],
   currentSortStatus: `Popular`,
+  isLogin: false,
+  favoritesOffersList: [],
 }
 
 const ActionType = {
@@ -14,6 +16,9 @@ const ActionType = {
   SET_REVIEWS_LIST: `SET_REVIEWS_LIST`,
   SET_FOCUS_CITY_LOCATION: `SET_FOCUS_CITY_LOCATION`,
   SET_CURRENT_SORT_STATUS: `SET_CURRENT_SORT_STATUS`,
+  SET_LOGIN_STATUS: `SET_LOGIN_STATUS`,
+  SET_FAVORITES_OFFERS_LIST: `SET_FAVORITES_OFFERS_LIST`,
+  CHANGE_FAVORITE_OFFER_STATUS: `CHANGE_FAVORITE_OFFER_STATUS`,
 }
 
 const ActionCreator = {
@@ -46,6 +51,21 @@ const ActionCreator = {
     type: ActionType.SET_CURRENT_SORT_STATUS,
     payload: sortStatus,
   }),
+
+  setLoginStatus: (loginStatus) => ({
+    type: ActionType.SET_LOGIN_STATUS,
+    payload: loginStatus,
+  }),
+
+  setFavoritesOffersList: (favoritesOffers) => ({
+    type: ActionType.SET_FAVORITES_OFFERS_LIST,
+    payload: favoritesOffers,
+  }),
+
+  changeFavoriteOfferStatus: (offerId) => ({
+    type: ActionType.CHANGE_FAVORITE_OFFER_STATUS,
+    payload: offerId,
+  }),
 };
 
 const reducer = (state = initialState, action) => {
@@ -62,8 +82,19 @@ const reducer = (state = initialState, action) => {
       return {...state, focusCityLocation: action.payload};
     case ActionType.SET_CURRENT_SORT_STATUS:
       return {...state, currentSortStatus: action.payload};
+    case ActionType.SET_LOGIN_STATUS:
+      return {...state, isLogin: action.payload};
+    case ActionType.SET_FAVORITES_OFFERS_LIST:
+      return {...state, favoritesOffersList: action.payload};
+    case ActionType.CHANGE_FAVORITE_OFFER_STATUS:
+      return {...state, rentalOffersList: [...state.rentalOffersList.map((offer) => {
+          if (offer.id === action.payload) {
+            offer.is_favorite = !offer.is_favorite;
+          }
+          return offer;
+        })]
+      }
   }
-
   return state;
 };
 

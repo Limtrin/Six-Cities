@@ -20,6 +20,8 @@ const ReviewsList: React.FunctionComponent<Props> = (props: Props) => {
     });
   }, [props.id]);
 
+  console.log(props.reviewsList);
+
   return (
     <>
       <h2 className="reviews__title">Reviews &middot; <span className="reviews__amount">{props.reviewsList.length}</span></h2>

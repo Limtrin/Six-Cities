@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useState, useRef } from "react";
+import { RentalOffersInterface } from "../types";
 import { connect } from "react-redux";
 import * as leaflet from "leaflet";
 
@@ -15,21 +16,26 @@ const PinIcons = {
 };  
 
 interface Props {
-  coordinates: number[][],
-  zoom: number,
+  rentalOffers: RentalOffersInterface,
   center?: number[],
   focusCityLocation: number[],
+  currentCity: string,
 }
 
 const Map: React.FunctionComponent<Props> = (props: Props) => {
-  const center = props.center ? props.center : props.coordinates[0];
+
+  console.log(props.rentalOffers);
+
+  const zoom = props.rentalOffers[0].city.location.zoom;
+  const coordinates = props.rentalOffers.map((rentalOffer) => [rentalOffer.location.latitude, rentalOffer.location.longitude]);
+  const center = [props.rentalOffers[0].city.location.latitude, props.rentalOffers[0].city.location.longitude];
 
   const mapRef = useRef(null);
   useEffect(() => {
     mapRef.current = leaflet.map(`map`, {
       marker: true,
       scrollWheelZoom: false,
-      zoom: props.zoom,
+      zoom,
       center: center,
       layers: [
         leaflet
@@ -42,7 +48,7 @@ const Map: React.FunctionComponent<Props> = (props: Props) => {
     return () => {
       mapRef.current.remove();
     }
-  },[center]);
+  },[props.currentCity]);
 
   const coordsRef = useRef([]);
   useEffect(() => {
@@ -52,14 +58,14 @@ const Map: React.FunctionComponent<Props> = (props: Props) => {
       });
       coordsRef.current = [];
     }
-    props.coordinates.forEach((offerCoords) => {
+    coordinates.forEach((offerCoords) => {
       const isActive = offerCoords.every((coordinate, index) => coordinate === props.focusCityLocation[index]);
       const pinElement = leaflet
         .marker(offerCoords, {icon: isActive ? PinIcons.pinActive : PinIcons.pin})
         .addTo(mapRef.current);
       coordsRef.current.push(pinElement);
     });
-  },[props.coordinates, props.focusCityLocation]);
+  },[coordinates, props.focusCityLocation]);
 
   return (
     <div id="map" style={{height: `100%`}}></div>
@@ -68,6 +74,7 @@ const Map: React.FunctionComponent<Props> = (props: Props) => {
 
 const mapStateToProps = (state) => ({
   focusCityLocation: state.focusCityLocation,
+  currentCity: state.currentCity,
 });
 
 export default connect(mapStateToProps)(Map);

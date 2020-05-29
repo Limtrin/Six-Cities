@@ -1,4 +1,5 @@
 import * as React from "react";
+import axios from "axios";
 import { RentalOfferInterface } from "../types";
 import { NavLink } from 'react-router-dom';
 import { connect } from "react-redux";
@@ -10,22 +11,26 @@ interface Props {
   rentalOffer: RentalOfferInterface,
   type: OfferCardType,
   setFocusCityLocation: (focisCityLocation: Object) => void,
+  changeFavoriteOfferStatus: (id: number) => void,
+  isFavorite: boolean,
 }
 
 const cardMainClasses = {
   cities: `cities__place-card`,
   near: `near-places__card`,
+  favorites: `favorites__card`,
 }
 
 const imageMainClasses = {
   cities: `cities__image-wrapper`,
   near: `near-places__image-wrapper`,
+  favorites: `favorites__image-wrapper`
 }
 
 const OfferCard: React.FunctionComponent<Props> = (props: Props) => {
-  const {rentalOffer, type, setFocusCityLocation} = props;
+  const {changeFavoriteOfferStatus, rentalOffer, type, setFocusCityLocation, isFavorite} = props;
 
-  const bookmarkClasses = rentalOffer.is_favorite ? `place-card__bookmark-button--active` : null;
+  const bookmarkClasses = isFavorite ? `place-card__bookmark-button--active` : null;
   const ratingPercents = rentalOffer.rating * 20;
 
   const handleItemEnter = (location: number[]) => {
@@ -34,6 +39,18 @@ const OfferCard: React.FunctionComponent<Props> = (props: Props) => {
 
   const handleItemLeave = () => {
     setFocusCityLocation([]);
+  }
+
+  const handleBookmarkClick = () => {
+    axios.post(`https://htmlacademy-react-3.appspot.com/six-cities/favorite/${rentalOffer.id}/${+!rentalOffer.is_favorite}`, null, { withCredentials: true })
+    .then((response) => {
+      if (response.status === 200) {
+        changeFavoriteOfferStatus(rentalOffer.id);
+      }
+    })
+    .catch((error) => {
+      return;
+    })
   }
 
   return (
@@ -63,7 +80,13 @@ const OfferCard: React.FunctionComponent<Props> = (props: Props) => {
             <b className="place-card__price-value">&euro;{rentalOffer.price}</b>
             <span className="place-card__price-text">&#47;&nbsp;night</span>
           </div>
-          <button className={`place-card__bookmark-button ${bookmarkClasses} button`} type="button">
+          <button
+            onClick={() => {
+              handleBookmarkClick();
+            }}
+            className={`place-card__bookmark-button ${bookmarkClasses} button`}
+            type="button"
+          >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use xlinkHref="#icon-bookmark"></use>
             </svg>
@@ -88,6 +111,9 @@ const OfferCard: React.FunctionComponent<Props> = (props: Props) => {
 const mapDispatchToProps = (dispatch) => ({
   setFocusCityLocation: (focusCityLocation) => {
     dispatch(ActionCreator.setFocusCityLocation(focusCityLocation));
+  },
+  changeFavoriteOfferStatus: (offerId) => {
+    dispatch(ActionCreator.changeFavoriteOfferStatus(offerId));
   }
 });
 
