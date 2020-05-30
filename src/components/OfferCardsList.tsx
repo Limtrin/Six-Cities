@@ -22,11 +22,9 @@ const Main: React.FunctionComponent<Props> = (props: Props) => {
       <div className="cities__places-list places__list tabs__content">
         {rentalOffersCurrentSort.map((rentalOffer) => (
           <OfferCard
-            //Вот над этим надо ещё подумать
             rentalOffer={rentalOffer}
             type={`cities`}
             key={rentalOffer.id}
-            isFavorite={rentalOffer.is_favorite}
           />
         ))}
       </div>

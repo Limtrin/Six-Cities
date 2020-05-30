@@ -48,9 +48,7 @@ const App: React.SFC<Props> = (props: Props) => {
           const chosenOffer = rentalOffers.find((offer) => offer.id == props.match.params.id);
           return chosenOffer && (
             <OfferPage
-              //Тут тоже самое
               rentalOffer={chosenOffer}
-              isFavorite={chosenOffer.is_favorite}
             />
           );
         }}

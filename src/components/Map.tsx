@@ -13,7 +13,7 @@ const PinIcons = {
     iconUrl: `/img/pin-active.svg`,
     iconSize: [30, 45]
   })
-};  
+};
 
 interface Props {
   rentalOffers: RentalOffersInterface,
@@ -23,8 +23,6 @@ interface Props {
 }
 
 const Map: React.FunctionComponent<Props> = (props: Props) => {
-
-  console.log(props.rentalOffers);
 
   const zoom = props.rentalOffers[0].city.location.zoom;
   const coordinates = props.rentalOffers.map((rentalOffer) => [rentalOffer.location.latitude, rentalOffer.location.longitude]);

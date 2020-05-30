@@ -13,6 +13,7 @@ interface Props {
   setFocusCityLocation: (focisCityLocation: Object) => void,
   changeFavoriteOfferStatus: (id: number) => void,
   isFavorite: boolean,
+  pizda: object,
 }
 
 const cardMainClasses = {
@@ -28,9 +29,9 @@ const imageMainClasses = {
 }
 
 const OfferCard: React.FunctionComponent<Props> = (props: Props) => {
-  const {changeFavoriteOfferStatus, rentalOffer, type, setFocusCityLocation, isFavorite} = props;
+  const {changeFavoriteOfferStatus, rentalOffer, type, setFocusCityLocation, isFavorite, pizda} = props;
 
-  const bookmarkClasses = isFavorite ? `place-card__bookmark-button--active` : null;
+  const bookmarkClasses = rentalOffer.is_favorite ? `place-card__bookmark-button--active` : null;
   const ratingPercents = rentalOffer.rating * 20;
 
   const handleItemEnter = (location: number[]) => {

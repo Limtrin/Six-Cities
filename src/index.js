@@ -8,8 +8,6 @@ import { createStore } from "redux";
 
 const store = createStore(reducer);
 
-window.sasha = store;
-
 ReactDOM.render(
   <Provider store={store}>
     <App rentalOffers={rentalOffers}/>

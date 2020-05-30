@@ -48,7 +48,7 @@ const OfferPage: React.FunctionComponent<Props> = (props: Props) => {
   const {rentalOffer, nearbyOffers} = props;
 
   const ratingPercents = rentalOffer.rating * 20;
-  const propertyBookmarkClasses = props.isFavorite ? `property__bookmark-button--active` : null;
+  const propertyBookmarkClasses = rentalOffer.is_favorite ? `property__bookmark-button--active` : null;
 
   return (
     <div className="page">

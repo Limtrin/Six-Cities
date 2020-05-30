@@ -89,7 +89,7 @@ const reducer = (state = initialState, action) => {
     case ActionType.CHANGE_FAVORITE_OFFER_STATUS:
       return {...state, rentalOffersList: [...state.rentalOffersList.map((offer) => {
           if (offer.id === action.payload) {
-            offer.is_favorite = !offer.is_favorite;
+            return {...offer, is_favorite: !offer.is_favorite}
           }
           return offer;
         })]
